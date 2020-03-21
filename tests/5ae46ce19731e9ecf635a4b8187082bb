@@ -1,0 +1,71 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+/**
+* Eric Lehman and Melina Young (lehman.e@northeastern.edu, young.mel@northeastern.edu)
+*/
+// an example rower object that rejects all rows that contain numbers that sum
+//  to a number greater than 10
+class FilterRower : public Rower {
+
+  public:
+
+    FilterRower() {}
+
+    /** Add one to the number of rows that we have seen
+    */
+    virtual bool accept(Row& r) {
+      float sum = 0;
+      for (int i = 0 ; i < r.width(); i++) {
+        char t = r.col_type(i);
+        if (t == 'F') {
+            sum += r.get_float(i);
+        } else if (t == 'I') {
+          sum += r.get_int(i);
+        }
+
+      }
+
+      return sum > 10;
+    }
+};
+// an example rower object that keeps track of num rows seen
+class ExampleRower : public Rower {
+
+  public:
+    size_t count;
+
+    ExampleRower() {
+      this->count = 0;
+    }
+
+    /** Add one to the number of rows that we have seen
+    */
+    virtual bool accept(Row& r) {
+      this->count += 1;
+      return true;
+    }
+};
+
+// Test that the dataframe  mapping and filtering a dataframe with no rows
+TEST(testDataFrameAdd, DataFrame) {
+  const char* types = "BIFS";
+  Schema* schema = new Schema(types);
+  DataFrame* df = new DataFrame(*schema);
+
+  ExampleRower r = ExampleRower();
+  df->map(r);
+
+  FilterRower* filter_rower = new FilterRower();
+  DataFrame* new_df = df->filter(*filter_rower);
+
+  ASSERT_TRUE(df->nrows() == 0 &&
+              r.count == 0 &&
+              df->nrows() == 0);
+}
+
+
+int main(int argc, char* argv[]){
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

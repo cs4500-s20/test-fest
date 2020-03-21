@@ -1,0 +1,33 @@
+#include <gtest/gtest.h>
+#include "dataframe.h" 
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+void testDataFrameFillRow() {
+  Schema s("FBBI");
+  DataFrame d(s);
+  Row r(s);
+  r.set(0, (float)3.2);
+  r.set(1, true);
+  r.set(2, false);
+  r.set(3, 4124);
+  d.add_row(r);
+  Row r2(s);
+  d.fill_row(0, r2);
+  ASSERT_NEAR(r.get_float(0), r2.get_float(0), 0.001);
+  GT_EQUALS(r.get_bool(1), r2.get_bool(1));
+  GT_EQUALS(r.get_bool(2), r2.get_bool(2));
+  GT_EQUALS(r.get_int(3), r2.get_int(3));
+  exit(0);
+}
+
+TEST(t6, testDataFrameFillRow) { ASSERT_EXIT_ZERO(testDataFrameFillRow);};
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

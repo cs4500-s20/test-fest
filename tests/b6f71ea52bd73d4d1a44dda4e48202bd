@@ -1,0 +1,33 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a) ASSERT_EQ((a), true)
+#define GT_FALSE(a) ASSERT_EQ((a), false)
+#define GT_EQUALS(a, b) ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a) \
+    ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+// Strings in a StringColumn are intended to be external.
+// This test verifies that Strings in a StringColumn
+// can be mutated outside the column, and the result will still
+// be present in the Column. If this is not true, Strings in
+// the Column are being copied
+void test_external_string() {
+    String* s1 = new String("Hello");
+    StringColumn* s_c = new StringColumn(1, s1);
+
+    GT_TRUE(s_c->get(0)->equals(s1));
+
+    delete s1;
+    s1 = new String("GoodBye");
+    GT_TRUE(s_c->get(0)->equals(s1));
+
+    exit(0);
+}
+
+TEST(a4Submitted1, testExternalString) { ASSERT_EXIT_ZERO(test_external_string); }
+
+int main(int argc, char** argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

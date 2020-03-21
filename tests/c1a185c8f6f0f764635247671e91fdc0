@@ -1,0 +1,54 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+
+
+// Test column naming functions for all types
+void test() {
+
+  // Construct schema with all 4 values
+  Schema s("");
+  GT_EQUALS(s.width(), 0);
+  GT_EQUALS(s.length(), 0);
+
+  // Name them all (with nullptr)
+  s.add_column('B', new String("Boolean"));
+  s.add_column('I', new String("Integer"));
+  s.add_column('F', new String("Float"));
+  s.add_column('S', new String("String"));
+  s.add_column('B', nullptr);
+
+  // Check the types and indexes
+  GT_EQUALS(s.col_type(0), 'B');
+  GT_EQUALS(s.col_type(1), 'I');
+  GT_EQUALS(s.col_type(2), 'F');
+  GT_EQUALS(s.col_type(3), 'S');
+  GT_EQUALS(s.col_idx("Boolean"), 0);
+  GT_EQUALS(s.col_idx("Integer"), 1);
+  GT_EQUALS(s.col_idx("Float"), 2);
+  GT_EQUALS(s.col_idx("String"), 3);
+
+  // Check the names
+  GT_TRUE(!strcmp(s.col_name(0)->c_str(), "Boolean"));
+  GT_TRUE(!strcmp(s.col_name(1)->c_str(), "Integer"));
+  GT_TRUE(!strcmp(s.col_name(2)->c_str(), "Float"));
+  GT_TRUE(!strcmp(s.col_name(3)->c_str(), "String"));
+  GT_EQUALS(s.width(), 5);
+  GT_EQUALS(s.length(), 0);
+
+
+  exit(0);
+}
+
+TEST(a4, st3){ ASSERT_EXIT_ZERO(test); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

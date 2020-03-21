@@ -1,0 +1,49 @@
+#include <gtest/gtest.h>
+#include "dataframe.h" 
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+/**
+ * Test the add_column functionality of a dataframe.
+ */
+void test_add_column()
+{
+    // create a Schema with two IntColumns
+    Schema s("II");
+
+    // create a DataFrame from the schema
+    DataFrame df(s);
+
+    // ensure the DataFrame has two columns, both of type int
+    GT_EQUALS(df.ncols(), 2);
+    GT_EQUALS(df.get_schema().col_type(0), 'I');
+    GT_EQUALS(df.get_schema().col_type(1), 'I');
+
+    // create two new columns, one string, one bool
+    StringColumn str_c;
+    BoolColumn bool_c;
+
+    // add the columns
+    df.add_column(&str_c, nullptr);
+    df.add_column(&bool_c, nullptr);
+
+    // ensure the dataframe and the schema were appropriately updated
+    Schema new_s = df.get_schema();
+    GT_EQUALS(df.ncols(), 4);
+    GT_EQUALS(new_s.width(), 4);
+    GT_EQUALS(new_s.col_type(2), 'S');
+    GT_EQUALS(new_s.col_type(3), 'B');
+
+    exit(0);
+}
+
+TEST(a4, test_add_column){ ASSERT_EXIT_ZERO(test_add_column); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

@@ -1,0 +1,55 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+/**
+* Eric Lehman and Melina Young (lehman.e@northeastern.edu, young.mel@northeastern.edu)
+*/
+// an example rower object that keeps track of num rows seen
+class ExampleRower : public Rower {
+
+  public:
+    size_t count;
+
+    ExampleRower() {
+      this->count = 0;
+    }
+
+    /** Add one to the number of rows that we have seen
+    */
+    virtual bool accept(Row& r) {
+      this->count += 1;
+      return true;
+    }
+};
+
+// Test that the dataframe maps and adds_rows correctly
+TEST(testDataFrameAdd, DataFrame) {
+  int count = 4;
+  const char* types = "BIFS";
+  Schema* schema = new Schema(types);
+  DataFrame* df = new DataFrame(*schema);
+  Row* row = new Row(*schema);
+  row->set(0, true);
+  row->set(1, 15);
+  row->set(2, float(3.5));
+  row->set(3, new String("yessir"));
+  //add rows to the dataframe
+  for(int i = 0; i < count ; i++) {
+    df->add_row(*row);
+  }
+
+  ExampleRower r = ExampleRower();
+  df->map(r);
+  ASSERT_TRUE(r.count == df->nrows() &&
+              r.count == count &&
+              df->nrows() == count &&
+              df->get_schema().length() == r.count &&
+              df->get_schema().length() == df->nrows() &&
+              df->get_schema().length() == count);
+
+}
+
+
+int main(int argc, char* argv[]){
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

@@ -1,0 +1,46 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+void test() {
+    // Making a Schema
+    Schema s("");
+    GT_EQUALS(s.width(), 0);
+
+    //Making DataFrame
+    DataFrame df(s);
+
+    //Creating Multiple Columns
+    df.add_column(new IntColumn(), new String("a"));
+    df.add_column(new IntColumn(), new String("b"));
+    df.add_column(new IntColumn(), new String("c"));
+    df.add_column(new IntColumn(), new String("d"));
+    df.add_column(new BoolColumn(), new String("e"));
+    df.add_column(new IntColumn(), new String("f"));
+    df.add_column(new IntColumn(), new String("g"));
+    df.add_column(new IntColumn(), new String("h"));
+    df.add_column(new IntColumn(), new String("i"));
+    df.add_column(new IntColumn(), new String("j"));
+    df.add_column(new IntColumn(), new String("k"));
+
+    GT_EQUALS(df.ncols(), 11);
+    GT_EQUALS(df.nrows(), 0);
+    GT_EQUALS(df.get_schema().width(), 11);
+    GT_EQUALS(df.get_schema().length(), 0);
+
+    exit(0);
+}
+/**
+ * set a random row
+ */
+TEST(a4, t1){ ASSERT_EXIT_ZERO(test); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

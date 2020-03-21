@@ -1,0 +1,59 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+/**
+ * Tests IntColumn functionality
+ */
+void testIntColumn() {
+
+   // With Var Args
+   IntColumn* c = new IntColumn(5, 1, 2, 3, 4, 5);
+
+   // Test GET
+   ASSERT_EQ(c->get(0), 1);
+   ASSERT_EQ(c->get(2), 3);
+   ASSERT_EQ(c->get(4), 5);
+
+   // Test SIZE
+   ASSERT_EQ(c->size(), 5);
+
+   // With Blank Constructor
+   delete c;
+   c = new IntColumn();
+
+   // Test push_back
+   c->push_back(1);
+   c->push_back(2);
+   c->push_back(3);
+   c->push_back(4);
+   c->push_back(5);
+   ASSERT_EQ(c->get(0), 1);
+   ASSERT_EQ(c->get(2), 3);
+   ASSERT_EQ(c->get(4), 5);
+
+   // Test SET
+   c->set(2, 6);
+   ASSERT_EQ(c->get(2), 6);
+   ASSERT_EQ(c->get(1), 2);
+   ASSERT_EQ(c->get(3), 4);
+   ASSERT_EQ(c->size(), 5);
+
+   delete c;
+
+   exit(0);
+}
+
+TEST(W1, testIntColumn) {
+ASSERT_EXIT_ZERO(testIntColumn);
+}
+
+int main(int argc, char **argv) {
+   testing::InitGoogleTest(&argc, argv);
+   return RUN_ALL_TESTS();
+}

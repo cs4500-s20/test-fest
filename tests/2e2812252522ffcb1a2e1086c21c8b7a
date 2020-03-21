@@ -1,0 +1,32 @@
+#include <gtest/gtest.h>
+#include "dataframe.h" 
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true);
+#define GT_FALSE(a)  ASSERT_EQ((a),false);
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b);
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*");
+
+// Check that Strings are external when setting a String value in a row.
+void test() {
+	Schema* s1 = new Schema("S");
+	Row* r1 = new Row(*s1);
+	String* str = new String("Hello");
+
+	r1->set(0, str);
+	delete r1;
+	
+	// Should still be able to access external String
+	// Should not have deleted with the Row object
+
+	// This function call will produce an error and exit with a non-zero status, failing the test
+	str->c_str();
+  exit(0);
+}
+
+TEST(a4, t3){ ASSERT_EXIT_ZERO(test); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

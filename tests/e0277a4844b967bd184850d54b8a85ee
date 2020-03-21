@@ -1,0 +1,37 @@
+#include "dataframe.h" 
+#include <stdio.h>
+#include <iostream>
+
+void FAIL() {   exit(1);    }
+void t_true(bool p) { if (!p) FAIL(); }
+void t_false(bool p) { if (p) FAIL(); }
+
+void test5() {
+  String* s = new String("hello");
+  String* h = new String("check");
+  StringColumn* a = new StringColumn();
+  //std::cout << a->size();
+  //std::cout<< a->get(0);
+  a->push_back(s);
+  //std::cout<< a->get(0);
+  a->push_back(s);
+  bool result = (a->get(0) == a->get(1));
+  std::cout << result;
+  a->set(0,h);
+  result = (a->get(0) == a->get(1));
+  std::cout<< result;
+  //t_true(a->get(0) == &s);
+  //std::cout << a->size();
+  std::cout << a->get_type();
+  //a->set(0,111);
+  //std::cout<< a->get(0);
+
+  //printf("2");
+}
+
+int main() {
+  test5();
+  
+  return 0;
+}
+

@@ -1,0 +1,36 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+// Test empty structures
+void test() {
+  // Construct schema with no values
+  Schema s("");
+  GT_EQUALS(s.width(), 0);
+  GT_EQUALS(s.length(), 0);
+
+  // Construct df with empty schema
+  DataFrame df(s);
+  GT_EQUALS(df.ncols(), 0);
+  GT_EQUALS(df.nrows(), 0);
+
+  // Construct row with empty schema from df
+  Row r(df.get_schema());
+  GT_EQUALS(r.width(), 0);
+
+  exit(0);
+}
+
+
+TEST(a4, st2){ ASSERT_EXIT_ZERO(test); }
+
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

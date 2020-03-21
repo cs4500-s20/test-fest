@@ -1,0 +1,46 @@
+#include <gtest/gtest.h>
+#include <string.h>
+#include <iostream>
+
+#include "dataframe.h"
+
+
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+// tests filling a data frame,
+// checking that it is able to satisfy
+// fill row behavior
+void test_df_fill_row() {
+    const char* schema_str = "IIIIIIIIIIIII";
+    Schema s(schema_str);
+    DataFrame df(s);
+    Row row(s);
+    size_t number_of_rows = 1000*1000;
+    // fill data frame rows with test data
+    for (size_t i = 0; i < number_of_rows; i++) {
+        for (size_t col = 0; col < strlen(schema_str); col++)
+            row.set(col, (int)col);
+        df.add_row(row);
+    }
+
+    // clear row
+    for (size_t i = 0; i < strlen(schema_str); i++)
+        row.set(i, 0);
+
+    // fill and check each row
+    for (size_t i = 0; i < number_of_rows; i++) {
+        df.fill_row(i, row); // fill entire row with test values
+        for (size_t col = 0; col < strlen(schema_str); col++) {
+            ASSERT_EQ(row.get_int(col), (int)col);
+        }
+    }
+    exit(0);
+}
+
+TEST(a4, test_df_fill_row){ ASSERT_EXIT_ZERO(test_df_fill_row); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

@@ -1,0 +1,42 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+/**
+ * Test if the DataFrame returns the correct number of rows.
+ */
+void test_num_rows()
+{
+    // Construct a schema
+    const char* schema_str = "IF";
+    Schema s(schema_str);
+
+    // Create the DataFrame, and a row to use, as well as the number of rows
+    DataFrame df(s);
+    Row r(df.get_schema());
+    size_t num_rows = 100000;
+
+    for (size_t i = 0; i < num_rows; i++)
+    {
+        // set values for each column in the row
+        r.set(0, (int)i);
+        r.set(1, (int)i * .5f);
+        df.add_row(r);
+    }
+
+    // we should have num_rows number of rows
+    GT_EQUALS(df.nrows(), num_rows);
+    exit(0);
+}
+
+TEST(a4, test_num_rows) { ASSERT_EXIT_ZERO(test_num_rows); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

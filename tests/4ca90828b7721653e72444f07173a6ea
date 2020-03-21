@@ -1,0 +1,92 @@
+/**
+ * Third test submission.
+ * Tests ...
+ *
+ * authors: jones.ja@husky.neu.edu, tam.ja@husky.neu.edu
+ */
+
+#include <gtest/gtest.h>
+
+#include "dataframe.h"
+
+#define GT_TRUE(a) ASSERT_EQ((a), true);
+#define GT_FALSE(a) ASSERT_EQ((a), false);
+#define GT_EQUALS(a, b) ASSERT_EQ(a, b);
+#define IS_CLOSE(a, b) (((a - b) < 0.01) || ((a - b) > -0.01))
+#define GT_CLOSE(a, b) GT_TRUE(IS_CLOSE(a, b))
+#define GT_FAR(a, b) GT_FALSE(IS_CLOSE(a, b))
+#define GT_EXIT_ZERO(a) ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*");
+
+/*******************************************************************************
+ * SumFloatRower::
+ * Iterates through each row of the data frame and sums every float that
+ * appears.
+ */
+class SumFloatRower : public Rower {
+ public:
+  float store_; /* < To keep track of the sum of floats. */
+
+  SumFloatRower() { this->store_ = 0.0f; }
+
+  /** Called once per row. Iterates through the columns and adds each float to
+   * this Rower's store. Always returns true because this rower is not used for
+   * filtering.
+   */
+  bool accept(Row &r) {
+    for (size_t i = 0; i < r.width(); i++) {
+      if (r.col_type(i) == 'F') {
+        this->store_ += r.get_float(i);
+      }
+    }
+
+    return true;
+  }
+
+  /** does nothing, there's no memory to clean up */
+  void join_delete(Rower *other) {
+    SumFloatRower *o = dynamic_cast<SumFloatRower *>(other);
+    assert(o != nullptr);
+    this->store_ += o->store_;
+    delete other;
+  }
+
+  /** Retrieves the sum of floats seen so far. */
+  float get_store() { return this->store_; }
+};
+
+void the_test() {
+  Schema s("BIFF");
+  DataFrame df(s);
+  Row r(df.get_schema());
+
+  // Populate the DataFrame.
+  for (int i = 0; i < 1000; i++) {
+    r.set(0, true);
+    r.set(1, i);
+    r.set(2, 2.4f);
+    r.set(3, -7.2f);
+    df.add_row(r);
+  }
+
+  SumFloatRower mule;
+  df.map(mule);
+
+  // Make sure the sum is correct.
+  float correct_sum = (2.4f + -7.2f) * 1000;
+  GT_CLOSE(mule.get_store(), correct_sum);
+
+  // Change a float in the DataFrame and check again.
+  df.set(3, 17, -17.2f);
+  SumFloatRower mule2;
+  df.map(mule2);
+  GT_CLOSE(mule2.get_store(), correct_sum - 10);
+
+  exit(0);
+}
+
+TEST(JAMMIN, T3) { GT_EXIT_ZERO(the_test); }
+
+int main(int argc, char **argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

@@ -1,0 +1,71 @@
+#include <gtest/gtest.h>
+#include "dataframe.h" 
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+TEST(a4, defaultConstructor){
+    // data
+    Schema* schema = new Schema();
+    String* col1Name = new String("identifier");
+    String* col2Name = new String("status");
+    String* row1Name = new String("item1");
+
+    // empty schema
+    GT_EQUALS(schema->length(), 0);
+    GT_EQUALS(schema->width(), 0);
+    GT_EQUALS(schema->col_idx("hi"), -1);
+    GT_EQUALS(schema->row_idx("there!"), -1);
+    GT_EQUALS(schema->col_idx(col1Name->c_str()), -1);
+    GT_EQUALS(schema->col_idx(col2Name->c_str()), -1);
+    GT_EQUALS(schema->row_idx(row1Name->c_str()), -1);
+
+    // add some types
+    schema->add_column('I', col1Name);
+    GT_EQUALS(schema->length(), 0);
+    GT_EQUALS(schema->width(), 1);
+    GT_EQUALS(schema->col_idx("hi"), -1);
+    GT_EQUALS(schema->row_idx("there!"), -1);
+    GT_EQUALS(schema->col_idx(col1Name->c_str()), 0);
+    GT_EQUALS(schema->col_idx(col2Name->c_str()), -1);
+    GT_EQUALS(schema->col_type(0), 'I');
+    GT_EQUALS(schema->row_idx(row1Name->c_str()), -1);
+
+    schema->add_column('B', col2Name);
+    GT_EQUALS(schema->length(), 0);
+    GT_EQUALS(schema->width(), 2);
+    GT_EQUALS(schema->col_idx("hi"), -1);
+    GT_EQUALS(schema->row_idx("there!"), -1);
+    GT_EQUALS(schema->col_idx(col1Name->c_str()), 0);
+    GT_EQUALS(schema->col_idx(col2Name->c_str()), 1);
+    GT_EQUALS(schema->col_type(1), 'B');
+    GT_EQUALS(schema->row_idx(row1Name->c_str()), -1);
+
+    // add some rows
+    schema->add_row(row1Name);
+    GT_EQUALS(schema->length(), 1);
+    GT_EQUALS(schema->width(), 2);
+    GT_EQUALS(schema->col_idx("hi"), -1);
+    GT_EQUALS(schema->row_idx("there!"), -1);
+    GT_EQUALS(schema->col_idx(col1Name->c_str()), 0);
+    GT_EQUALS(schema->col_idx(col2Name->c_str()), 1);
+    GT_EQUALS(schema->col_type(1), 'B');
+    GT_EQUALS(schema->row_idx(row1Name->c_str()), 0);
+    GT_TRUE(schema->row_name(0)->equals(row1Name));
+
+    // cleanup
+    delete schema;
+    delete col1Name;
+    delete col2Name;
+    delete row1Name;
+
+    SUCCEED();
+}
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

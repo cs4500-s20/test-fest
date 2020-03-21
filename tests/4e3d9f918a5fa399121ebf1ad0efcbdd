@@ -1,0 +1,58 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+void submitted_test_3() {
+  // create a schema with some unnamed columns
+  Schema* schema = new Schema("BBIIIB");
+
+  // create a Dataframe with columns, but no fields
+  DataFrame* df = new DataFrame(*schema);
+  GT_EQUALS(df->ncols(), 6);
+  GT_EQUALS(df->nrows(), 0);
+
+  // add a row to append stuff with
+  Row row1(df->get_schema());
+  row1.set(0, false);
+  row1.set(1, true);
+  row1.set(2, 100);
+  row1.set(3, -90);
+  row1.set(4, 18);
+  row1.set(5, false);
+  df->add_row(row1);
+
+  GT_EQUALS(df->ncols(), 6);
+  GT_EQUALS(df->nrows(), 1);
+
+  // append existing row n times
+  for (int i = 0; i < 5; i++) {
+    Row row(df->get_schema());
+    df->fill_row(0, row);
+    df->add_row(row);
+  }
+
+  GT_EQUALS(df->ncols(), 6);
+  GT_EQUALS(df->nrows(), 6);
+
+  // check for identical columns
+  for (int i = 0; i < df->nrows(); i++) {
+    GT_FALSE(df->get_bool(0, i));
+    GT_EQUALS(df->get_int(4, i), 18);
+  }
+
+  exit(0);
+}
+
+TEST(a4, submitted_test_3){
+  ASSERT_EXIT_ZERO(submitted_test_3);
+}
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

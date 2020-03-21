@@ -1,0 +1,55 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+#include <iostream>
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+/**
+ * Test the as_* methods on the column type.
+ */
+void test_column_conversions()
+{
+    Column* int_c = new IntColumn();
+    Column* bool_c = new BoolColumn();
+    Column* float_c = new FloatColumn();
+    Column* string_c = new StringColumn();
+
+    // ensure int_c only returns true for as_int (when not a nullptr)
+    GT_EQUALS(int_c->as_bool(), nullptr);
+    GT_EQUALS(int_c->as_string(), nullptr);
+    GT_EQUALS(int_c->as_float(), nullptr);
+    GT_EQUALS(int_c->as_int(), int_c);
+
+    GT_EQUALS(bool_c->as_bool(), bool_c);
+    GT_EQUALS(bool_c->as_string(), nullptr);
+    GT_EQUALS(bool_c->as_float(), nullptr);
+    GT_EQUALS(bool_c->as_int(), nullptr);
+
+    GT_EQUALS(float_c->as_bool(), nullptr);
+    GT_EQUALS(float_c->as_string(), nullptr);
+    GT_EQUALS(float_c->as_float(), float_c);
+    GT_EQUALS(float_c->as_int(), nullptr);
+
+    GT_EQUALS(string_c->as_bool(), nullptr);
+    GT_EQUALS(string_c->as_string(), string_c);
+    GT_EQUALS(string_c->as_float(), nullptr);
+    GT_EQUALS(string_c->as_int(), nullptr);
+    
+    delete int_c;
+    delete bool_c;
+    delete float_c;
+    delete string_c;
+
+    exit(0);
+}
+
+TEST(a4, test_column_conversions) { ASSERT_EXIT_ZERO(test_column_conversions); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

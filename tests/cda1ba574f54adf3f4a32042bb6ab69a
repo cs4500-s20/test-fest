@@ -1,0 +1,74 @@
+#include <gtest/gtest.h>
+#include "dataframe.h" 
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+//Test schema class
+void test() {
+   // make a new empty schema
+    Schema *mySchema = new Schema();
+    String name("name");
+    String age("age");
+    String female("female");
+    String height("height");
+    // a schema does not assume responsibility for its column name strings, so we can use stack variables
+    mySchema->add_column('S', &name);
+    mySchema->add_column('I', &age);
+    mySchema->add_column('B', &female);
+    mySchema->add_column('F', &height);
+    
+    //test finding names from an index
+    GT_TRUE(mySchema->col_name(0)->equals(&name));
+    GT_TRUE(mySchema->col_name(1)->equals(&age));
+    GT_TRUE(mySchema->col_name(3)->equals(&height));
+    GT_TRUE(mySchema->col_name(2)->equals(&female));
+    
+    //test findind indicies from a name
+    GT_EQUALS(mySchema->col_idx(name.c_str()), 0);
+    GT_EQUALS(mySchema->col_idx(age.c_str()), 1);
+    GT_EQUALS(mySchema->col_idx(female.c_str()), 2);
+    GT_EQUALS(mySchema->col_idx(height.c_str()), 3);
+
+    //test getting col types
+
+    GT_EQUALS(mySchema->col_type(0), 'S');
+    GT_EQUALS(mySchema->col_type(2), 'B');
+    GT_EQUALS(mySchema->col_type(3), 'F');
+    GT_EQUALS(mySchema->col_type(1), 'I');
+
+
+    String john("John");
+    String sally("Sally");
+    String alex("Alex");
+    mySchema->add_row(&john);
+    mySchema->add_row(&sally);
+    mySchema->add_row(&alex); 
+    
+    
+    //test the same functionality for rows
+    GT_TRUE(mySchema->row_name(0)->equals(&john));
+    GT_TRUE(mySchema->row_name(1)->equals(&sally));
+    GT_TRUE(mySchema->row_name(2)->equals(&alex));
+
+    GT_EQUALS(mySchema->row_idx(john.c_str()), 0);
+    GT_EQUALS(mySchema->row_idx(sally.c_str()), 1);
+    GT_EQUALS(mySchema->row_idx(alex.c_str()), 2);
+
+    //test width and length
+    GT_EQUALS(mySchema->width(), 4);
+    GT_EQUALS(mySchema->length(), 3);
+
+    delete mySchema;
+    exit(0);
+}
+
+TEST(a4, t1){ ASSERT_EXIT_ZERO(test); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

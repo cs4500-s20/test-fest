@@ -1,0 +1,34 @@
+#include <gtest/gtest.h>
+#include "dataframe.h" 
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+//Wider version of the sanity check test
+void test() {
+  Schema s("IISSBBFF");
+  DataFrame df(s);
+  Row  r(df.get_schema());
+  for(size_t i = 0; i <  1000; i++) {
+    r.set(0,(int)i);
+    r.set(1,(int)i+1);
+    r.set(2, new String("abc"));
+    r.set(3, new String("def"));
+    r.set(4, true);
+    r.set(5, false);
+    r.set(6, (float)1.1);
+    r.set(7, (float)2.2);
+    df.add_row(r);
+  }
+  exit(0);
+}
+
+TEST(a4, t4){ ASSERT_EXIT_ZERO(test); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

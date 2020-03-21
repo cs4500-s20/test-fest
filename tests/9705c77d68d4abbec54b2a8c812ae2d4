@@ -1,0 +1,78 @@
+#include <gtest/gtest.h>
+#include "dataframe.h" 
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+/* This tests Column functionality initialized with the default constructor. */
+
+void test() {
+    // Initializing columns---These are initialized as Column* type to test
+    // type converter functionality.
+    Column* intColT = new IntColumn();
+    Column* boolColT = new BoolColumn();
+    Column* floatColT = new FloatColumn();
+    Column* stringColT = new StringColumn();
+    String* s1 = new String("Hello");
+    String* s2 = new String("World");
+
+    //type converter tests
+    GT_EQUALS(intColT->as_int() != nullptr, true);
+    GT_EQUALS(boolColT->as_bool() != nullptr, true);
+    GT_EQUALS(floatColT->as_float() != nullptr, true);
+    GT_EQUALS(stringColT->as_string() != nullptr, true);
+    GT_EQUALS(intColT->as_bool(), nullptr);
+    GT_EQUALS(boolColT->as_float(), nullptr);
+    GT_EQUALS(floatColT->as_string(), nullptr);
+    GT_EQUALS(stringColT->as_int(), nullptr);
+
+    // Create column type-specific aliases for testing column functionality
+    IntColumn* intCol = intColT->as_int();
+    BoolColumn* boolCol = boolColT->as_bool();
+    FloatColumn* floatCol = floatColT->as_float();
+    StringColumn* stringCol = stringColT->as_string();
+
+    // push_back and get
+    intCol->push_back(1);
+    boolCol->push_back(false);
+    floatCol->push_back(3.0);
+    stringCol->push_back(s1);
+
+    // Are the Columns populated properly?
+    GT_EQUALS(intCol->get(0), 1);
+    GT_EQUALS(boolCol->get(0), false);
+    GT_EQUALS(floatCol->get(0), 3.0);
+    GT_EQUALS(stringCol->get(0), s1);
+
+    // Heavily test push_back
+    for (int i = 0; i < 50; i++) {
+        intCol->push_back(i);
+        boolCol->push_back(true);
+        floatCol->push_back(7.0);
+        stringCol->push_back(s2);
+    }
+
+    // Size tests
+    GT_EQUALS(intCol->size(), 51);
+    GT_EQUALS(boolCol->size(), 51);
+    GT_EQUALS(floatCol->size(), 51);
+    GT_EQUALS(stringCol->size(), 51);
+
+    // Get tests
+    GT_EQUALS(intCol->get(50), 49);
+    GT_EQUALS(boolCol->get(50), true);
+    GT_EQUALS(floatCol->get(50), 7.0);
+    GT_EQUALS(stringCol->get(50), s2);
+
+    exit(0);
+}
+
+TEST(a4, t1){ ASSERT_EXIT_ZERO(test); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

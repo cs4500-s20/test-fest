@@ -1,0 +1,37 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+
+  /***
+  This test checks that data can be properly retrieved from the dataframe by calling
+  get_bool and get_int, and checking the values returned.
+  */
+void test() {
+  Schema s("IBI");
+
+  DataFrame df(s);
+  Row  r(df.get_schema());
+  for(size_t i = 0; i <  100; i++) {
+    r.set(0,(int)i);
+    r.set(1,(bool)(i % 2 == 0));
+    r.set(3,(int)i+1);
+    df.add_row(r);
+  }
+  ASSERT_EQ(df.get_bool(1,0), true);
+  ASSERT_EQ(df.get_int(0,10), 10);
+
+  exit(0);
+}
+
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    test();
+    return RUN_ALL_TESTS();
+}

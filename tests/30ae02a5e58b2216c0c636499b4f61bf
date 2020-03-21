@@ -1,0 +1,32 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+
+/***
+This test is a basic check that a dataframe can be created from a schema, then populated with int/bool data.
+*/
+void test() {
+    Schema s("IBI");
+
+    DataFrame df(s);
+    Row  r(df.get_schema());
+    for(size_t i = 0; i <  100; i++) {
+      r.set(0,(int)i);
+      r.set(1,(bool)(i % 2 == 0));
+      r.set(3,(int)i+1);
+      df.add_row(r);
+    }
+    exit(0);
+  }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    test();
+    return RUN_ALL_TESTS();
+}

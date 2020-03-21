@@ -1,0 +1,59 @@
+/*
+ * Authors: Brian Yeung, Daniel Gao
+ * Emails: yeung.bri@husky.neu.edu, gao.d@husky.neu.edu
+ * CS4500 Assignment 4
+ */
+
+//lang::Cpp
+
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a) ASSERT_EQ((a), true)
+#define GT_FALSE(a) ASSERT_EQ((a), false)
+#define GT_EQUALS(a, b) ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a) ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+void test2()
+{
+  Schema s("FBIS");
+  EXPECT_EQ(s.width(), 4);
+  EXPECT_EQ(s.length(), 0);
+
+  String empty_str("");
+  String col_name("New Column");
+  s.add_column('S', &col_name);
+  s.add_column('F', &col_name);
+  EXPECT_EQ(s.col_name(1), nullptr);
+  EXPECT_EQ(s.col_name(2), nullptr);
+  EXPECT_EQ(s.col_name(3), nullptr);
+  EXPECT_EQ(s.col_name(4), &col_name);
+
+  EXPECT_EQ(s.col_type(0), 'F');
+  EXPECT_EQ(s.col_type(1), 'B');
+  EXPECT_EQ(s.col_type(2), 'I');
+  EXPECT_EQ(s.col_type(3), 'S');
+  EXPECT_EQ(s.col_type(4), 'S');
+
+  EXPECT_EQ(s.col_idx(""), -1);
+  // Return first col with that name in case of duplicates
+  EXPECT_EQ(s.col_idx("New Column"), 4);
+
+  String row_name("New Row");
+  s.add_row(&row_name);
+  EXPECT_EQ(s.row_name(0), &row_name);
+  EXPECT_EQ(s.row_idx("New Row"), 0);
+
+  EXPECT_EQ(s.width(), 6);
+  EXPECT_EQ(s.length(), 1);
+
+  exit(0);
+}
+
+TEST(a4, test2){ ASSERT_EXIT_ZERO(test2); }
+
+int main(int argc, char **argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

@@ -1,0 +1,53 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a) ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+/**
+ * Tests the functionality of the get methods in the dataframe with all datatypes
+ */
+void test4() {
+    Schema s("IFBSIFBS");
+
+    DataFrame df(s);
+    Row r(df.get_schema());
+    for (size_t i = 0; i < 100; i+=1) {
+        r.set(0, (int) i);
+        r.set(1, (float)i + float(0.5));
+        r.set(2, true);
+        String g("finna");
+        r.set(3, &g);
+        i += 1;
+        r.set(4, (int) i);
+        r.set(5, (float)i + float(0.5));
+        r.set(6, false);
+        String h("gonna");
+        r.set(7, &h);
+        df.add_row(r);
+    }
+    for (size_t i = 0; i < 1; i += 1) {
+        int l = (int)i * 2;
+        GT_EQUALS(df.get_int((size_t)0,i), l);
+        GT_EQUALS(df.get_float((size_t)1,i), l + 0.5);
+        GT_EQUALS(df.get_bool((size_t)2,i), true);
+        String g("finna");
+        GT_TRUE(df.get_string((size_t)3,i)->equals(&g));
+        l += 1;
+        GT_EQUALS(df.get_int((size_t)4,i), l);
+        GT_EQUALS(df.get_float((size_t)5,i), l + 0.5);
+        GT_EQUALS(df.get_bool((size_t)6,i), false);
+        String h("gonna");
+        GT_TRUE(df.get_string((size_t)7,i)->equals(&h));
+    }
+    exit(0);
+}
+
+TEST(a4, t1){ ASSERT_EXIT_ZERO(test4); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    RUN_ALL_TESTS();
+}

@@ -1,0 +1,19 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+// Testing Functionality of Schema in DataFrames
+// Schemas cannot be modified once dataframe is created.
+TEST(DFSchemaTest, HandleSchemaMod) {
+	Schema s("IB");
+
+	DataFrame df(s);
+	s.add_column('I', new String("IntColumn"));
+
+	ASSERT_EQ(2, df.ncols());
+	ASSERT_EQ(3, s.width());
+} 
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

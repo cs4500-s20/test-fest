@@ -1,0 +1,25 @@
+#include <gtest/gtest.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "dataframe.h"
+
+#define GT_TRUE(a) ASSERT_EQ((a), true)
+#define GT_FALSE(a) ASSERT_EQ((a), false)
+#define GT_EQUALS(a, b) ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a) ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+TEST(a4s4, SchemaUpdateTest) {
+    Schema s("I");
+    DataFrame df(s);
+    df.add_column(new FloatColumn(), nullptr);
+
+    ASSERT_EQ(df.get_schema().width(), 2);
+    ASSERT_EQ(df.get_schema().col_type(1), 'F');
+    ASSERT_EQ(df.get_schema().col_name(1), nullptr);
+}
+
+int main(int argc, char** argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

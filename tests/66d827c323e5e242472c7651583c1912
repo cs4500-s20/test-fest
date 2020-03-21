@@ -1,0 +1,80 @@
+#include <gtest/gtest.h>
+#include "dataframe.h" 
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+void test() {// Test the creation of a dataframe from a schema and adding rows
+  Schema s("II");
+  DataFrame df(s);
+  Row  r(df.get_schema());
+
+  GT_TRUE(df.ncols() == 2);
+  GT_TRUE(df.nrows() == 0);
+  for(size_t i = 0; i <  100000; i++) {
+    r.set(0,(int)i);
+    r.set(1,(int)i+1);
+    df.add_row(r);
+  }
+
+  // Test adding new columns
+  GT_TRUE(df.ncols() == 2);
+  GT_TRUE(df.nrows() == 100000);
+  FloatColumn* new_column_1 = new FloatColumn();
+  BoolColumn* new_column_2 = new BoolColumn();
+  FloatColumn* new_column_3 = new FloatColumn();
+  BoolColumn* new_column_4 = new BoolColumn();
+  for(size_t i = 0; i < 100000; i++) {
+    new_column_1->push_back(3.14);
+    new_column_2->push_back(true);
+    new_column_3->push_back(-29.311222);
+    new_column_4->push_back(false);
+  }
+
+  df.add_column(new_column_1, nullptr);
+  df.add_column(new_column_2, new String("Bool name"));
+  df.add_column(new_column_3, new String("Float name"));
+  df.add_column(new_column_4, nullptr);
+
+  GT_TRUE(df.ncols() == 6);
+  GT_TRUE(df.nrows() == 100000);
+  GT_TRUE(df.get_float(2, 11)-3.14 < 0.00001);
+  GT_TRUE(df.get_bool(3, 33) == true);
+  GT_TRUE(df.get_float(4, 59)+29.311222 < 0.00001);
+  GT_TRUE(df.get_bool(5, 88) == false);
+
+  df.set(0, 5, (int)2);
+  df.set(0, 20, (int)10329483);
+  df.set(0, 59, (int) -2000);
+
+  GT_TRUE(df.get_int(0, 5) == 2);
+  GT_TRUE(df.get_int(0, 20) == 10329483);
+  GT_TRUE(df.get_int(0, 59) == -2000);
+
+  df.set(2, 5, (float)2.1);
+  df.set(2, 20, (float) 3.4);
+  df.set(2, 59, (float) 53.24);
+
+  GT_TRUE(df.get_float(2, 5)-2.1 < 0.001);
+  GT_TRUE(df.get_float(2, 20)-3.4 < 0.001);
+  GT_TRUE(df.get_float(2, 59)-53.24 < 0.0001);
+
+  df.set(3, 0, true);
+  df.set(3, 99, false);
+  df.set(3, 32, false);
+
+  GT_TRUE(df.get_bool(3, 0));
+  GT_TRUE(!df.get_bool(3, 99));
+  GT_TRUE(!df.get_bool(3, 32));
+  exit(0);
+}
+
+TEST(a4, t1){ ASSERT_EXIT_ZERO(test); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

@@ -1,0 +1,55 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+void submitted_test_2() {
+  // create a schema with some unnamed columns
+  Schema* schema = new Schema("IBIBI");
+
+  // create a Dataframe with columns, but no fields
+  DataFrame* df = new DataFrame(*schema);
+  GT_EQUALS(df->ncols(), 5);
+  GT_EQUALS(df->nrows(), 0);
+
+  // create some rows to place into dataframe
+  Row row1(df->get_schema());
+  row1.set(0, 1);
+  row1.set(1, false);
+  row1.set(2, 10);
+  row1.set(3, true);
+  row1.set(4, -1);
+
+  Row row2(df->get_schema());
+  row2.set(0, 15);
+  row2.set(1, true);
+  row2.set(2, -5);
+  row2.set(3, true);
+  row2.set(4, 6);
+
+  // add rows
+  df->add_row(row1);
+  df->add_row(row2);
+  GT_EQUALS(df->ncols(), 5);
+  GT_EQUALS(df->nrows(), 2);
+
+  // check integrity of some item s
+  GT_TRUE(df->get_bool(3, 1));
+  GT_EQUALS(df->get_int(2, 0), 10);
+  GT_EQUALS(df->get_int(0, 0), 1);
+
+  exit(0);
+}
+
+TEST(a4, submitted_test_2){
+  ASSERT_EXIT_ZERO(submitted_test_2);
+}
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

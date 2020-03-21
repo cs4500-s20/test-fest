@@ -1,0 +1,83 @@
+#include <gtest/gtest.h>
+#include "dataframe.h" 
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+/*****************************************************************************
+ * SumBytesFielder::
+ * This fielder sums the size in bytes of each field.
+ */
+class SumBytesFielder : public Fielder {
+public:
+  size_t* sum_;
+
+  SumBytesFielder(size_t* sum) {
+    sum_ = sum;
+  }
+
+  ~SumBytesFielder() {
+
+  }
+
+  /** Called before visiting a row, the argument is the row offset in the
+    dataframe. */
+  virtual void start(size_t r)  {
+
+  }
+ 
+  /** Called for fields of the argument's type with the value of the field. */
+  virtual void accept(bool b) {
+    *sum_ += sizeof(bool);
+  }
+
+  virtual void accept(float f) {
+    *sum_ += sizeof(float);
+  }
+
+  virtual void accept(int i) {
+    *sum_ += sizeof(int);
+  }
+
+  virtual void accept(String* s) {
+    *sum_ += sizeof(String*);
+  }
+ 
+  /** Called when all fields have been seen. */
+  virtual void done() {
+
+  }
+  
+};
+
+void test() {
+  Schema s("IFSB");
+  Row* row = new Row(s);
+  String* hi = new String("hi");
+  size_t sum_actual = 0;
+  SumBytesFielder* f = new SumBytesFielder(&sum_actual);
+  size_t sum_expect = sizeof(int) + sizeof(float) + sizeof(bool) + sizeof(String*);
+
+  row->set(0, 4);
+  row->set(1, (float)3.2);
+  row->set(2, hi);
+  row->set(3, (bool)0);
+  row->visit(0, *f);
+
+  GT_EQUALS(sum_actual, sum_expect);
+
+  delete row;
+  delete hi;
+  delete f;
+  exit(0);
+}
+
+TEST(a4, t1){ ASSERT_EXIT_ZERO(test); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

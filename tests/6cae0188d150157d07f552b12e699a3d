@@ -1,0 +1,18 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+// Testing copy constructor for dataframe
+TEST(CopyConstructorTest, HandleCopyConstructor) {
+	Schema scm("II");
+  DataFrame temp(scm);
+  DataFrame df(temp);
+
+  ASSERT_EQ(temp.get_schema().width(), df.get_schema().width());
+  ASSERT_EQ(temp.get_schema().length(), 0);
+  ASSERT_EQ(df.get_schema().length(), 0);
+} 
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

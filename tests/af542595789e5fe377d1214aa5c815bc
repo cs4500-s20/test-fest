@@ -1,0 +1,92 @@
+// lang::cpp
+
+#include <gtest/gtest.h>
+#include "dataframe.h"
+using namespace std;
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+// tests int columns
+void test_int_column() {
+    // test creation of empty int column
+    IntColumn* ic1 = new IntColumn();
+    GT_EQUALS(ic1->size(), 0);          
+
+    // add values to the empty int column
+    ic1->push_back(1);
+    ic1->push_back(2);
+    ic1->push_back(3);
+    ic1->push_back(4);
+    ic1->push_back(5);
+    ic1->push_back(6);
+    ic1->push_back(7);
+    ic1->push_back(8);
+    ic1->push_back(9);
+    ic1->push_back(10);
+    ic1->push_back(11);
+
+    // test size of column and some gets
+    GT_EQUALS(ic1->size(), 11);
+    GT_EQUALS(ic1->get(0), 1);
+    GT_EQUALS(ic1->get(6), 7);
+    GT_EQUALS(ic1->get(10), 11);
+
+    // replace some values in the column
+    ic1->set(0, 12);
+    ic1->set(6, 13);
+    ic1->set(10, 14);
+
+    // test size remains the same and that the sets replaced values
+    GT_EQUALS(ic1->get(0), 12);
+    GT_EQUALS(ic1->get(6), 13);
+    GT_EQUALS(ic1->get(10), 14);
+    GT_EQUALS(ic1->size(), 11);
+
+    // test that the column is of type int
+    GT_EQUALS(ic1->get_type(), 'I');
+
+    // creation of an IC given values
+    IntColumn* ic2 = new IntColumn(20, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
+
+    GT_EQUALS(ic2->size(), 20);
+
+    // add some values to IC
+    ic2->push_back(21);
+    ic2->push_back(22);
+    ic2->push_back(23);
+
+    // test size of IC and some gets
+    GT_EQUALS(ic2->size(), 23);
+    GT_EQUALS(ic2->get(0), 1);
+    GT_EQUALS(ic2->get(10), 11);
+    GT_EQUALS(ic2->get(21), 22);
+
+    // replace some values
+    ic2->set(0, 24);
+    ic2->set(10, 25);
+    ic2->set(21, 26);
+
+    // test size remains the same and values were replaced
+    GT_EQUALS(ic2->get(0), 24);
+    GT_EQUALS(ic2->get(10), 25);
+    GT_EQUALS(ic2->get(21), 26);
+    GT_EQUALS(ic2->size(), 23);
+
+    // test column is of type int
+    GT_EQUALS(ic2->get_type(), 'I');
+
+    delete ic1;
+    delete ic2;
+    exit(0);
+}
+
+TEST(a4, t1){ ASSERT_EXIT_ZERO(test_int_column); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

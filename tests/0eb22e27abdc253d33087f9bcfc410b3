@@ -1,0 +1,35 @@
+#include "dataframe.h"
+#include <gtest/gtest.h>
+
+#define GT_TRUE(a) ASSERT_EQ((a), true)
+#define GT_FALSE(a) ASSERT_EQ((a), false)
+#define GT_EQUALS(a, b) ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a) ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+/**
+ * This test creates a row comprised of integers, and tries to add it to a
+ * DataFrame of the same Schema as the row.
+ *
+ * This test sees if the row was correctly added to the DataFrame, and if we can
+ * get the corresponding integers from the DataFrame.
+ */
+void test_get_int() {
+  Schema *sc = new Schema("II");
+  DataFrame *df = new DataFrame(*sc);
+  Row *row1 = new Row(*sc);
+  row1->set(0, -15);
+  row1->set(1, 8900);
+
+  df->add_row(*row1);
+
+  GT_EQUALS(df->get_int(0, 0), -15);
+  GT_EQUALS(df->get_int(1, 0), 8900);
+  exit(0);
+}
+
+TEST(a4, t1) { ASSERT_EXIT_ZERO(test_get_int); }
+
+int main(int argc, char **argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

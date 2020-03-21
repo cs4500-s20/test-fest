@@ -1,0 +1,25 @@
+#include <gtest/gtest.h>
+#include "dataframe.h" 
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+void testRowCreation() {
+  Schema sc("FFIS");
+  Row r(sc);
+  GT_EQUALS(r.width(), 4);
+  r.set(0, (float)3.2);
+  ASSERT_NEAR(r.get_float(0), 3.2, 0.001);
+  ASSERT_EQ(r.col_type(3), 'S');
+  exit(0);
+}
+
+TEST(a4, t3){ ASSERT_EXIT_ZERO(testRowCreation); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

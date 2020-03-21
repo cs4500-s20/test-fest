@@ -1,0 +1,43 @@
+#include <gtest/gtest.h>
+#include "dataframe.h"
+
+#define GT_TRUE(a)   ASSERT_EQ((a),true)
+#define GT_FALSE(a)  ASSERT_EQ((a),false)
+#define GT_EQUALS(a, b)   ASSERT_EQ(a, b)
+#define ASSERT_EXIT_ZERO(a)  \
+  ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
+
+/**
+ * Test if the DataFrame returns the correct number of columns.
+ */
+void test_num_cols()
+{
+    // Construct an Int, Float, Int, Bool Schema
+    Schema s("IFIB");
+
+    // Create the DataFrame, and a row to use, as well as the number of rows
+    DataFrame df(s);
+    Row r(df.get_schema());
+    size_t num_rows = 100000;
+
+    for (size_t i = 0; i < num_rows; i++)
+    {
+        // set values for each column in a row
+        r.set(0, (int)i);
+        r.set(1, (int)i * .5f);
+        r.set(2, (int)(i + 1));
+        r.set(3, (i % 2) == 0);
+        df.add_row(r);
+    }
+
+    // number of columns should still be 4
+    GT_EQUALS(df.ncols(), 4);
+    exit(0);
+}
+
+TEST(a4, test_num_cols) { ASSERT_EXIT_ZERO(test_num_cols); }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
